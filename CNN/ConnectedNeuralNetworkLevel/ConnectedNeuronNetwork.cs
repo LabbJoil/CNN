@@ -20,16 +20,15 @@ internal class ConnectedNeuronNetwork
         CreateOutputLayer();
     }
 
-    public List<double> Backpropagation(double[] exprected, double[] inputs)
+    public (double[], double[]) Backpropagation(double[] exprected, double[] inputs)
     {
-        List<double> differences = [];
-        Predict(inputs);
-        var outputNeurons = Layers.Last().Neurons;
+        var outputNeurons = Predict(inputs);
+        double[] differences = new double[outputNeurons.Length];
 
-        for (int neuronIndex = 0; neuronIndex < outputNeurons.Count; neuronIndex++)
+        for (int neuronIndex = 0; neuronIndex < outputNeurons.Length; neuronIndex++)
         {
             var difference = outputNeurons[neuronIndex].Output - exprected[neuronIndex];
-            differences.Add(difference * difference);
+            differences[neuronIndex] = (difference * difference);
             outputNeurons[neuronIndex].Learn(difference, Topology.LearningRate);
         }
 
@@ -40,24 +39,21 @@ internal class ConnectedNeuronNetwork
 
             for (int i = 0; i < layer.NeuronCount; i++)
             {
-                var neuron = layer.Neurons[i];
-
-                for (int k = 0; k < previousLayer.NeuronCount; k++)
-                {
-                    var previousNeuron = previousLayer.Neurons[k];
-                    var error = previousNeuron.Weights[i] * previousNeuron.Delta;
-                    neuron.Learn(error, Topology.LearningRate);
-                }
+                var neuron = layer.NeuronsProperty[i];
+                double neuronDelta = previousLayer.NeuronsProperty.Sum(n => n.Weights[i] * n.Delta);
+                neuron.Learn(neuronDelta, Topology.LearningRate);
             }
         }
-        return differences;
+        var deltas = Layers.First().NeuronsProperty.Select(n => n.Delta).ToArray();
+        return (deltas, differences);
     }
 
     public Neuron[] Predict(params double[] inputSignals)
     {
         SendSignalsToInputNeurons(inputSignals);
         FeedForwardAllLayersAfterInput();
-        return [.. Layers.Last().Neurons.OrderByDescending(n => n.Output)];
+        //return [.. Layers.Last().NeuronsProperty.OrderByDescending(n => n.Output)];
+        return [.. Layers.Last().NeuronsProperty];
     }
 
     private void FeedForwardAllLayersAfterInput()
@@ -67,10 +63,8 @@ internal class ConnectedNeuronNetwork
             var layer = Layers[i];
             var previousLayerSingals = Layers[i - 1].GetSignals();
 
-            foreach (var neuron in layer.Neurons)
-            {
+            foreach (var neuron in layer.NeuronsProperty)
                 neuron.FeedForward(previousLayerSingals);
-            }
         }
     }
 
@@ -79,7 +73,7 @@ internal class ConnectedNeuronNetwork
         for (int i = 0; i < inputSignals.Length; i++)
         {
             var signal = new List<double>() { inputSignals[i] };
-            var neuron = Layers[0].Neurons[i];
+            var neuron = Layers[0].NeuronsProperty[i];
             neuron.FeedForward(signal);
         }
     }

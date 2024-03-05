@@ -9,5 +9,5 @@ namespace CNM.ConvolutionalLevel;
 public enum ConvolutionalType
 {
     Fold,
-    Padding
+    Pulling
 }

@@ -8,9 +8,11 @@ namespace CNM.ConnectedNeuralNetwork;
 
 internal class Layer
 {
-    public List<Neuron> Neurons { get; }
-    public int NeuronCount => Neurons?.Count ?? 0;
+    public List<Neuron> NeuronsProperty { get => new(Neurons); }
+    public int NeuronCount => NeuronsProperty?.Count ?? 0;
+
     public NeuronType Type;
+    private readonly List<Neuron> Neurons;
 
     public Layer(List<Neuron> neurons, NeuronType type = NeuronType.Hidden)
     {
@@ -23,7 +25,7 @@ internal class Layer
     public List<double> GetSignals()
     {
         var result = new List<double>();
-        foreach (var neuron in Neurons)
+        foreach (var neuron in NeuronsProperty)
         {
             result.Add(neuron.Output);
         }

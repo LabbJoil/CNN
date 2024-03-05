@@ -37,31 +37,48 @@ internal class ConvolutionalNeuronNetwork
     private double Backpropagation(double[] exprected, double[,] matrixImage)
     {
         SetInputLayer(matrixImage);
-
         for (int layerIndex = 1; layerIndex < ConvolutionalLayers.Count; layerIndex++)
         {
             var layer = ConvolutionalLayers[layerIndex];
             var previousLayer = ConvolutionalLayers[layerIndex - 1];
             for (int conObject = 0; conObject < ConvolutionalTopology.CountMaps; conObject++)
-                layer.ConvolutionalObjects[conObject].Сollapse(previousLayer.ConvolutionalObjects[conObject].СollapsedMatrix ?? throw new Exception("Ошибка при поиске матрицы прошлого уровня"));
+                layer.ConvolutionalObjects[conObject].Сollapse(previousLayer.ConvolutionalObjects[conObject].СollapsedMatrixProperty);
         }
+
         var lastLayer = ConvolutionalLayers.Last();
         List<double> inputNeurons = [];
         foreach(var convObject in lastLayer.ConvolutionalObjects)
         {
-            double[,] collapsedMatrix = convObject.СollapsedMatrix ?? throw new Exception("Ошибка при поиске матрицы выходного уровня");
+            var collapsedMatrix = convObject.СollapsedMatrixProperty;
             for (int y = 0; y < collapsedMatrix.GetLength(0); y++)
-            {
                 for (int x = 0; x < collapsedMatrix.GetLength(1); x++)
-                {
                     inputNeurons.Add(collapsedMatrix[y, x]);
-                }
-            }
         }
+
+        //TODO: необходимо возвращать на уровень выше
+
         NeuralNetworkTopology neuralNetworkTopology = new(inputNeurons.Count, 3, 0.1, [inputNeurons.Count / 2, inputNeurons.Count / 2]);
         ConnectedNeuronNetwork connectedNN = new(neuralNetworkTopology);
-        var errors = connectedNN.Backpropagation(exprected, [.. inputNeurons]);
+        var (deltas, differences) = connectedNN.Backpropagation(exprected, [.. inputNeurons]);
 
+        foreach (var convObject in lastLayer.ConvolutionalObjects)
+        {
+            var collapseMatrix = convObject.СollapsedMatrixProperty;
+            int height = collapseMatrix.GetLength(0);
+            int width = collapseMatrix.GetLength(1);
+            double[,] deltasMatrix = new double[height, width];
+
+            for (int y = 0; y < height; y++)
+            {
+                var row = y * height;
+                for (int x = 0; x < width; x++)
+                    deltasMatrix[y, x] = deltas[row + x];
+            }
+            convObject.ReCollapse(deltasMatrix, ConvolutionalTopology.jjj);
+        }
+
+
+        return 1; // TODO: затычка
     }
 
     
@@ -71,41 +88,11 @@ internal class ConvolutionalNeuronNetwork
             conObject.Сollapse(matrixImage);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     private void CreateLayers()
     {
         for (int i = 0; i < ConvolutionalTopology.CountLayers; i++)
         {
-            ConvolutionalType type = i % 2 == 0 ? ConvolutionalType.Fold : ConvolutionalType.Padding;
+            ConvolutionalType type = i % 2 == 0 ? ConvolutionalType.Fold : ConvolutionalType.Pulling;
             ConvolutionalObject[] layer = new ConvolutionalObject[ConvolutionalTopology.CountMaps];
             for (int j = 0; j < ConvolutionalTopology.CountMaps; j++)
             {
@@ -115,10 +102,4 @@ internal class ConvolutionalNeuronNetwork
             ConvolutionalLayers.Add(new ConvolutionalLayer(layer));
         }
     }
-   
-    private void SendToConnectedNeuronNetwork()
-    {
-        //NeuralNetworkTopology neuralNetworkTopology = new();
-    }
-
 }

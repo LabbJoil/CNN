@@ -4,7 +4,7 @@ namespace CNM.ConnectedNeuralNetwork;
 internal class Neuron
 {
     public List<double> Weights { get; } = [];
-    public List<double> Inputs { get; } = [];
+    public List<double> Inputs { get; private set; } = [];
     public NeuronType NeuronType { get; }
     public double Output { get; private set; }
     public double Delta { get; private set; }
@@ -18,61 +18,45 @@ internal class Neuron
     private void InitWeightsRandomValue(int inputCount)
     {
         var rand = new Random();
-
+        Inputs = new(inputCount);
         for (int i = 0; i < inputCount; i++)
         {
             if (NeuronType == NeuronType.Input)
-            {
                 Weights.Add(1);
-            }
             else
-            {
                 Weights.Add(rand.NextDouble());
-            }
-            Inputs.Add(0);
         }
     }
 
     public double FeedForward(List<double> inputs)
     {
         for (int i = 0; i < inputs.Count; i++)
-        {
             Inputs[i] = inputs[i];
-        }
 
-        var sum = 0.0;
+        double sum = 0;
         for (int i = 0; i < inputs.Count; i++)
-        {
             sum += inputs[i] * Weights[i];
-        }
 
         if (NeuronType != NeuronType.Input)
-        {
             Output = Activation.Sigmoid(sum);
-        }
         else
-        {
             Output = sum;
-        }
 
         return Output;
     }
 
-    public void Learn(double error, double learningRate)
+    public void Learn(double delta, double learningRate)
     {
-        if (NeuronType == NeuronType.Input)
-        {
-            return;
-        }
+        Delta = delta;
 
-        Delta = error * Activation.SigmoidDx(Output);
+        if (NeuronType == NeuronType.Input)
+            return;
 
         for (int i = 0; i < Weights.Count; i++)
         {
             var weight = Weights[i];
             var input = Inputs[i];
-
-            var newWeigth = weight - input * Delta * learningRate;
+            var newWeigth = weight - learningRate * Delta * Activation.SigmoidDx(Output) * input; // TODO: maybe minus
             Weights[i] = newWeigth;
         }
     }
