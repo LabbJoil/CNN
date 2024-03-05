@@ -1,7 +1,10 @@
 ﻿
+using CNN.Abstract;
+using CNN.Model;
+
 namespace CNM.ConnectedNeuralNetwork;
 
-internal class Neuron
+internal class Neuron : NetworkComponent
 {
     public List<double> Weights { get; } = [];
     public List<double> Inputs { get; private set; } = [];
@@ -45,19 +48,24 @@ internal class Neuron
         return Output;
     }
 
-    public void Learn(double delta, double learningRate)
+    public override void Learn<T>(T deltaT)
     {
-        Delta = delta;
-
-        if (NeuronType == NeuronType.Input)
-            return;
-
-        for (int i = 0; i < Weights.Count; i++)
+        if (deltaT is double delta)
         {
-            var weight = Weights[i];
-            var input = Inputs[i];
-            var newWeigth = weight - learningRate * Delta * Activation.SigmoidDx(Output) * input; // TODO: maybe minus
-            Weights[i] = newWeigth;
+            Delta = delta;
+
+            if (NeuronType == NeuronType.Input)
+                return;
+
+            for (int i = 0; i < Weights.Count; i++)
+            {
+                var weight = Weights[i];
+                var input = Inputs[i];
+                var newWeigth = weight - LearningRate * Delta * Activation.SigmoidDx(Output) * input; // TODO: maybe minus
+                Weights[i] = newWeigth;
+            }
         }
+        else
+            throw new InvalidOperationException("Unsupported type conversion");
     }
 }

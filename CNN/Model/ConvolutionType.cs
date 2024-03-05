@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CNM.ConnectedNeuralNetwork;
+namespace CNN.Model;
 
-public enum NeuronType
+public enum ConvolutionType
 {
-    Input,
-    Hidden,
-    Output
+    Fold,
+    Pulling
 }

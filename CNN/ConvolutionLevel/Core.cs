@@ -1,9 +1,10 @@
 ﻿
-using static System.Formats.Asn1.AsnWriter;
+using CNN.Abstract;
+using CNN.Model;
 
 namespace CNM.ConvolutionalLevel;
 
-internal class ConvolutionalObject
+internal class Core : NetworkComponent
 {
     private readonly Matrix2D<double> InputMatrix = new("Input");
     private readonly Matrix2D<double> СollapsedMatrix = new("Collapsed");
@@ -12,16 +13,16 @@ internal class ConvolutionalObject
     private (int, int)[]? MaxElementsPulling;
     private int CollapseStep = 1;
 
-    private ConvolutionalType Type { get; }
+    private ConvolutionType Type { get; }
     public double[,] СollapsedMatrixProperty
     {
         get => СollapsedMatrix.MatrixTable;
     }
 
-    public ConvolutionalObject(ConvolutionalType type, int? sizeCore = null)
+    public Core(ConvolutionType type, int? sizeCore = null)
     {
         Type = type;
-        if (type == ConvolutionalType.Fold)
+        if (type == ConvolutionType.Fold)
         {
             if (sizeCore is int wh)
             {
@@ -36,18 +37,21 @@ internal class ConvolutionalObject
     public void Сollapse(double[,] inputMatrix)
     {
         InputMatrix.SetMatrix(inputMatrix);
-        if (Type == ConvolutionalType.Fold)
+        if (Type == ConvolutionType.Fold)
             ConvolutionMatrix();
         else
             Pulling();
     }
 
-    public void ReCollapse(double[,] error, double learningRate)
+    public void ReCollapse(double[,] deltas)
     {
-        if (Type == ConvolutionalType.Fold)
-            ReConvolutionMatrix(error, learningRate);
+        if (Type == ConvolutionType.Fold)
+        {
+            ReConvolutionMatrix(deltas);
+            Learn(deltas);
+        }
         else
-            RePulling(error);
+            RePulling(deltas);
     }
 
     private void ConvolutionMatrix()
@@ -75,7 +79,7 @@ internal class ConvolutionalObject
         СollapsedMatrix.SetMatrix(collapsedMatrix);
     }
 
-    private void ReConvolutionMatrix(double[,] deltas, double learningRate)
+    private void ReConvolutionMatrix(double[,] deltas)
     {
         //INFO: работает пока что только с CollapseStep = 1
         //TODO: проверить в demo
@@ -106,14 +110,24 @@ internal class ConvolutionalObject
                 reСollapsedMatrix[yConverMatrix, xConverMatrix] = sum;
             }
         ReСollapsedMatrix.SetMatrix(reСollapsedMatrix);
+    }
 
-        for (int y = 0; y < heightCore; y++)
-            for (int x = 0; x < widthCore; x++)
-            {
-                var weight = core[y, x];
-                var newWeigth = weight - learningRate * deltas[y, x]; // TODO: maybe plus
-                core[y, x] = newWeigth;
-            }
+    public override void Learn<T>(T delta)
+    {
+        if (delta is double[,] deltas)
+        {
+            var (core, heightCore, widthCore) = CoreMatrix.MatrixData;
+            for (int y = 0; y < heightCore; y++)
+                for (int x = 0; x < widthCore; x++)
+                {
+                    var weight = core[y, x];
+                    var newWeigth = weight - LearningRate * deltas[y, x]; // TODO: maybe plus
+                    core[y, x] = newWeigth;
+                }
+            CoreMatrix.SetMatrix(core);
+        }
+        else
+            throw new InvalidOperationException("Unsupported type conversion");
     }
 
     private void Pulling()

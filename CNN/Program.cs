@@ -1,4 +1,5 @@
 ﻿using CNM.ConvolutionalLevel;
+using CNN.Model;
 
 namespace CNM;
 
@@ -37,7 +38,7 @@ internal class Program
         //};
 
 
-        ConvolutionalObject oo = new(ConvolutionalType.Pulling);
+        Core oo = new(ConvolutionType.Pulling);
         oo.Сollapse(jj);
         oo.ReCollapse(ii);
     }

@@ -11,10 +11,10 @@ namespace CNM;
 internal class Topology
 {
     public NeuralNetworkTopology NetworkTopology { get; }
-    public ConvolutionalTopology SubsamplingLayer { get; }
+    public ConvolutionTopology SubsamplingLayer { get; }
     public double LearningRate { get; }
 
-    public Topology(NeuralNetworkTopology networkTopology, ConvolutionalTopology subsamplingLayer, double learningRate)
+    public Topology(NeuralNetworkTopology networkTopology, ConvolutionTopology subsamplingLayer, double learningRate)
     {
         NetworkTopology = networkTopology;
         SubsamplingLayer = subsamplingLayer;

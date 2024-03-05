@@ -4,15 +4,16 @@ using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
+using CNN.Model;
 
 namespace CNM.ConnectedNeuralNetwork;
 
-internal class ConnectedNeuronNetwork
+internal class NeuronNetwork
 {
     private NeuralNetworkTopology Topology { get; }
-    private List<Layer> Layers { get; } = [];
+    private List<NeuralNetworkLayer> Layers { get; } = [];
 
-    public ConnectedNeuronNetwork(NeuralNetworkTopology topology)
+    public NeuronNetwork(NeuralNetworkTopology topology)
     {
         Topology = topology;
         CreateInputLayer();
@@ -87,7 +88,7 @@ internal class ConnectedNeuronNetwork
             var neuron = new Neuron(lastLayer.NeuronCount, NeuronType.Output);
             outputNeurons.Add(neuron);
         }
-        var outputLayer = new Layer(outputNeurons, NeuronType.Output);
+        var outputLayer = new NeuralNetworkLayer(outputNeurons, NeuronType.Output);
         Layers.Add(outputLayer);
     }
 
@@ -102,7 +103,7 @@ internal class ConnectedNeuronNetwork
                 var neuron = new Neuron(lastLayer.NeuronCount);
                 hiddenNeurons.Add(neuron);
             }
-            var hiddenLayer = new Layer(hiddenNeurons);
+            var hiddenLayer = new NeuralNetworkLayer(hiddenNeurons);
             Layers.Add(hiddenLayer);
         }
     }
@@ -115,7 +116,7 @@ internal class ConnectedNeuronNetwork
             var neuron = new Neuron(1, NeuronType.Input);
             inputNeurons.Add(neuron);
         }
-        var inputLayer = new Layer(inputNeurons, NeuronType.Input);
+        var inputLayer = new NeuralNetworkLayer(inputNeurons, NeuronType.Input);
         Layers.Add(inputLayer);
     }
 }

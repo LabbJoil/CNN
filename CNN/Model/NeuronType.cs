@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CNM.ConvolutionalLevel;
+namespace CNN.Model;
 
-public enum ConvolutionalType
+public enum NeuronType
 {
-    Fold,
-    Pulling
+    Input,
+    Hidden,
+    Output
 }

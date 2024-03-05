@@ -1,4 +1,5 @@
 ﻿using CNM.ConnectedNeuralNetwork;
+using CNN.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,12 +8,12 @@ using System.Threading.Tasks;
 
 namespace CNM.ConvolutionalLevel;
 
-internal class ConvolutionalNeuronNetwork
+internal class Convolution
 {
-    public ConvolutionalTopology ConvolutionalTopology { get; }
-    private List<ConvolutionalLayer> ConvolutionalLayers { get; } = [];
+    public ConvolutionTopology ConvolutionalTopology { get; }
+    private List<ConvolutionLayer> ConvolutionalLayers { get; } = [];
 
-    public ConvolutionalNeuronNetwork(ConvolutionalTopology topology)
+    public Convolution(ConvolutionTopology topology)
     {
         ConvolutionalTopology = topology;
         CreateLayers();
@@ -58,7 +59,7 @@ internal class ConvolutionalNeuronNetwork
         //TODO: необходимо возвращать на уровень выше
 
         NeuralNetworkTopology neuralNetworkTopology = new(inputNeurons.Count, 3, 0.1, [inputNeurons.Count / 2, inputNeurons.Count / 2]);
-        ConnectedNeuronNetwork connectedNN = new(neuralNetworkTopology);
+        NeuronNetwork connectedNN = new(neuralNetworkTopology);
         var (deltas, differences) = connectedNN.Backpropagation(exprected, [.. inputNeurons]);
 
         foreach (var convObject in lastLayer.ConvolutionalObjects)
@@ -92,14 +93,14 @@ internal class ConvolutionalNeuronNetwork
     {
         for (int i = 0; i < ConvolutionalTopology.CountLayers; i++)
         {
-            ConvolutionalType type = i % 2 == 0 ? ConvolutionalType.Fold : ConvolutionalType.Pulling;
-            ConvolutionalObject[] layer = new ConvolutionalObject[ConvolutionalTopology.CountMaps];
+            ConvolutionType type = i % 2 == 0 ? ConvolutionType.Fold : ConvolutionType.Pulling;
+            Core[] layer = new Core[ConvolutionalTopology.CountMaps];
             for (int j = 0; j < ConvolutionalTopology.CountMaps; j++)
             {
-                if (type == ConvolutionalType.Fold)
-                    layer[j] = new ConvolutionalObject(type, ConvolutionalTopology.CoreSize);
+                if (type == ConvolutionType.Fold)
+                    layer[j] = new Core(type, ConvolutionalTopology.CoreSize);
             }
-            ConvolutionalLayers.Add(new ConvolutionalLayer(layer));
+            ConvolutionalLayers.Add(new ConvolutionLayer(layer));
         }
     }
 }

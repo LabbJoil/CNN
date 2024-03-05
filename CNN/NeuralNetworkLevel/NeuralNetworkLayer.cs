@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CNN.Model;
 
 namespace CNM.ConnectedNeuralNetwork;
 
-internal class Layer
+internal class NeuralNetworkLayer
 {
     public List<Neuron> NeuronsProperty { get => new(Neurons); }
     public int NeuronCount => NeuronsProperty?.Count ?? 0;
@@ -14,7 +15,7 @@ internal class Layer
     public NeuronType Type;
     private readonly List<Neuron> Neurons;
 
-    public Layer(List<Neuron> neurons, NeuronType type = NeuronType.Hidden)
+    public NeuralNetworkLayer(List<Neuron> neurons, NeuronType type = NeuronType.Hidden)
     {
         // TODO: проверить все входные нейроны на соответствие типу
 

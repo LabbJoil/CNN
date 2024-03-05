@@ -11,8 +11,4 @@
     <PackageReference Include="Aspose.Drawing" Version="24.2.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Abstract\" />
-  </ItemGroup>
-
 </Project>

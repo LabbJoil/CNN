@@ -1,11 +1,11 @@
 ﻿
 namespace CNM.ConvolutionalLevel;
 
-internal class ConvolutionalLayer
+internal class ConvolutionLayer
 {
-    public ConvolutionalObject[] ConvolutionalObjects { get; }
+    public Core[] ConvolutionalObjects { get; }
 
-    public ConvolutionalLayer(ConvolutionalObject[] convolutionalObjects)
+    public ConvolutionLayer(Core[] convolutionalObjects)
     {
         ConvolutionalObjects = convolutionalObjects;
     }
