@@ -1,7 +1,6 @@
-﻿
-namespace CNM;
+﻿namespace CNN.NeuralNetworkLevel;
 
-internal class Matrix2D<T>(string name)
+internal class MatrixHolder<T>(string name)
 {
     private T[,]? Matrix;
     private int Height;

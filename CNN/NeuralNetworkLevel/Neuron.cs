@@ -12,7 +12,7 @@ internal class Neuron : NetworkComponent
     public double Output { get; private set; }
     public double Delta { get; private set; }
 
-    public Neuron(int inputCount, NeuronType type = NeuronType.Hidden)
+    public Neuron(int inputCount, double learningRate, NeuronType type = NeuronType.Hidden) : base(learningRate)
     {
         NeuronType = type;
         InitWeightsRandomValue(inputCount);

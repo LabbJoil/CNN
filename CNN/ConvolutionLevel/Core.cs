@@ -1,25 +1,28 @@
 ﻿
 using CNN.Abstract;
 using CNN.Model;
+using CNN.NeuralNetworkLevel;
 
 namespace CNM.ConvolutionalLevel;
 
 internal class Core : NetworkComponent
 {
-    private readonly Matrix2D<double> InputMatrix = new("Input");
-    private readonly Matrix2D<double> СollapsedMatrix = new("Collapsed");
-    private readonly Matrix2D<double> ReСollapsedMatrix = new("ReCollapsed");
-    private readonly Matrix2D<double> CoreMatrix = new("Core");
+    // Разделить на несколько классов | добавить интерфейсы (один их них maybe contains method Learn)
+
+    private readonly MatrixHolder<double> InputMatrix = new("Input");
+    private readonly MatrixHolder<double> СollapsedMatrix = new("Collapsed");
+    private readonly MatrixHolder<double> ReСollapsedMatrix = new("ReCollapsed");
+    private readonly MatrixHolder<double> CoreMatrix = new("Core");
     private (int, int)[]? MaxElementsPulling;
     private int CollapseStep = 1;
 
     private ConvolutionType Type { get; }
-    public double[,] СollapsedMatrixProperty
+    public double[,] СollapsedMatrixTable
     {
         get => СollapsedMatrix.MatrixTable;
     }
 
-    public Core(ConvolutionType type, int? sizeCore = null)
+    public Core(ConvolutionType type, double learningRate, int? sizeCore = null) : base(learningRate)
     {
         Type = type;
         if (type == ConvolutionType.Fold)
@@ -179,8 +182,6 @@ internal class Core : NetworkComponent
 
     private void RePulling(double[,] deltas)
     {
-        //TODO: проверить в demo
-
         if (MaxElementsPulling == null)
             throw new Exception("Max elements of pulling not found");
 
@@ -244,8 +245,8 @@ internal class Core : NetworkComponent
     {
         Random rand = new();
         var core = new double[height, width];
-        for (int y = 0; y < height; height++)
-            for (int x = 0; x < width; width++)
+        for (int y = 0; y < height; y++)
+            for (int x = 0; x < width; x++)
                 core[y, x] = rand.NextDouble() - 0.5;
         return core;
     }

@@ -8,16 +8,8 @@ using System.Threading.Tasks;
 
 namespace CNM;
 
-internal class Topology
+internal class Topology(ConvolutionTopology subsamplingLayer, double learningRate)
 {
-    public NeuralNetworkTopology NetworkTopology { get; }
-    public ConvolutionTopology SubsamplingLayer { get; }
-    public double LearningRate { get; }
-
-    public Topology(NeuralNetworkTopology networkTopology, ConvolutionTopology subsamplingLayer, double learningRate)
-    {
-        NetworkTopology = networkTopology;
-        SubsamplingLayer = subsamplingLayer;
-        LearningRate = learningRate;
-    }
+    public ConvolutionTopology SubsamplingLayer { get; } = subsamplingLayer;
+    public double LearningRate { get; } = learningRate;
 }

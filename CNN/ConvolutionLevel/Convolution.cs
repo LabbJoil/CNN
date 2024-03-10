@@ -10,61 +10,71 @@ namespace CNM.ConvolutionalLevel;
 
 internal class Convolution
 {
-    public ConvolutionTopology ConvolutionalTopology { get; }
+    private ConvolutionTopology ConvolutionalTopology { get; }
     private List<ConvolutionLayer> ConvolutionalLayers { get; } = [];
 
     public Convolution(ConvolutionTopology topology)
     {
+        // Maybe CreateInputLayers
         ConvolutionalTopology = topology;
         CreateLayers();
     }
 
-    public double Learn(double[,] expected, double[][,] inputeMatrixImages, int epoch)
+    public double Learn(double[][] expected, double[][,] matrixImages, int epoch)
     {
+        // TODO: входные параметры изменить на Dictionary | скорее всего вынести логику выше, и использовать expected на NeuralNetwork
         var error = 0.0;
         for (int i = 0; i < epoch; i++)
-        {
             for (int j = 0; j < expected.GetLength(0); j++)
             {
-                var output = ConverterPicture.GetRow(expected, j);
-                var input = inputeMatrixImages[j];
+                var output = expected[j];
+                var input = matrixImages[j];
                 error += Backpropagation(output, input);
             }
-        }
         var result = error / epoch;
         return result;
     }
 
-    private double Backpropagation(double[] exprected, double[,] matrixImage)
+    public List<double> Predict(double[,] matrixImage)
     {
         SetInputLayer(matrixImage);
+        FeedForwardLayers();
+
+        List<double> inputNeurons = []; // TODO: переделать в массив
+        foreach (var convObject in ConvolutionalLayers.Last().ConvolutionalObjects)
+        {
+            var collapsedMatrix = convObject.СollapsedMatrixTable;
+            for (int y = 0; y < collapsedMatrix.GetLength(0); y++)
+                for (int x = 0; x < collapsedMatrix.GetLength(1); x++)
+                    inputNeurons.Add(collapsedMatrix[y, x]);
+        }
+        return inputNeurons;
+    }
+
+    public void FeedForwardLayers()
+    {
         for (int layerIndex = 1; layerIndex < ConvolutionalLayers.Count; layerIndex++)
         {
             var layer = ConvolutionalLayers[layerIndex];
             var previousLayer = ConvolutionalLayers[layerIndex - 1];
             for (int conObject = 0; conObject < ConvolutionalTopology.CountMaps; conObject++)
-                layer.ConvolutionalObjects[conObject].Сollapse(previousLayer.ConvolutionalObjects[conObject].СollapsedMatrixProperty);
+                layer.ConvolutionalObjects[conObject].Сollapse(previousLayer.ConvolutionalObjects[conObject].СollapsedMatrixTable);
         }
+    }
 
-        var lastLayer = ConvolutionalLayers.Last();
-        List<double> inputNeurons = [];
-        foreach(var convObject in lastLayer.ConvolutionalObjects)
-        {
-            var collapsedMatrix = convObject.СollapsedMatrixProperty;
-            for (int y = 0; y < collapsedMatrix.GetLength(0); y++)
-                for (int x = 0; x < collapsedMatrix.GetLength(1); x++)
-                    inputNeurons.Add(collapsedMatrix[y, x]);
-        }
+    private double Backpropagation(double[] exprected, double[,] matrixImage)
+    {
+
+        //TODO: отдельный метод FeedForward
+        var inputNeurons = Predict(matrixImage);
 
         //TODO: необходимо возвращать на уровень выше
 
-        NeuralNetworkTopology neuralNetworkTopology = new(inputNeurons.Count, 3, 0.1, [inputNeurons.Count / 2, inputNeurons.Count / 2]);
-        NeuronNetwork connectedNN = new(neuralNetworkTopology);
-        var (deltas, differences) = connectedNN.Backpropagation(exprected, [.. inputNeurons]);
+        
 
-        foreach (var convObject in lastLayer.ConvolutionalObjects)
+        foreach (var convObject in ConvolutionalLayers.Last().ConvolutionalObjects)
         {
-            var collapseMatrix = convObject.СollapsedMatrixProperty;
+            var collapseMatrix = convObject.СollapsedMatrixTable;
             int height = collapseMatrix.GetLength(0);
             int width = collapseMatrix.GetLength(1);
             double[,] deltasMatrix = new double[height, width];
@@ -75,11 +85,11 @@ internal class Convolution
                 for (int x = 0; x < width; x++)
                     deltasMatrix[y, x] = deltas[row + x];
             }
-            convObject.ReCollapse(deltasMatrix, ConvolutionalTopology.jjj);
+            convObject.ReCollapse(deltasMatrix);
         }
 
 
-        return 1; // TODO: затычка
+        return 1; // INFO: затычка
     }
 
     
@@ -87,6 +97,11 @@ internal class Convolution
     {
         foreach(var conObject in ConvolutionalLayers.First().ConvolutionalObjects)
             conObject.Сollapse(matrixImage);
+    }
+
+    private void CreateInputLayers()
+    {
+
     }
 
     private void CreateLayers()

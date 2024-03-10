@@ -1,4 +1,5 @@
-﻿using CNM.ConvolutionalLevel;
+﻿using CNM.ConnectedNeuralNetwork;
+using CNM.ConvolutionalLevel;
 using CNN.Model;
 
 namespace CNM;
@@ -24,7 +25,7 @@ internal class Program
 
         //double[,] jj = new double[5, 5]{
         //    { 1, 2, 3, 4, 20 },
-        //    { 5, 6, 7, 8, 21 },
+        //    { 5, 6, 8, 7, 21 },
         //    { 9, 10, 11, 12, 22 },
         //    { 13, 14, 15, 16, 23 },
         //    { 16, 17, 18, 19, 24 },
@@ -38,8 +39,29 @@ internal class Program
         //};
 
 
-        Core oo = new(ConvolutionType.Pulling);
+        Core oo = new(ConvolutionType.Fold, 0.1, 2);
         oo.Сollapse(jj);
         oo.ReCollapse(ii);
+    }
+
+    static void StartLearning(Dictionary<string, int> pathImageKeyMeanbase10Value, double learningRate, int countEpoch)
+    {
+        int maxMean = pathImageKeyMeanbase10Value.Max(kv => kv.Value);
+        Dictionary<byte[,,], int[]> pathImageKeyMean2baseValue = [];
+        foreach(var kv in pathImageKeyMeanbase10Value)
+        {
+            var preparedMatrix = ConverterPicture.(kv.Key);
+            var masbase2 = new int[maxMean];
+            masbase2[kv.Value - 1] = 1;
+            pathImageKeyMean2baseValue[kv.Key] = masbase2;
+        }
+
+        ConvolutionTopology topology = new(3, 3, 2);
+        Convolution convolution = new (topology);
+        convolution.Learn();
+
+        NeuralNetworkTopology neuralNetworkTopology = new(inputNeurons.Count, 3, 0.1, [inputNeurons.Count / 2, inputNeurons.Count / 2]);
+        NeuronNetwork connectedNN = new(neuralNetworkTopology);
+        var (deltas, differences) = connectedNN.Backpropagation(exprected, [.. inputNeurons]);
     }
 }

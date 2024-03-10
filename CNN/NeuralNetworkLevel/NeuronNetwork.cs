@@ -30,7 +30,7 @@ internal class NeuronNetwork
         {
             var difference = outputNeurons[neuronIndex].Output - exprected[neuronIndex];
             differences[neuronIndex] = (difference * difference);
-            outputNeurons[neuronIndex].Learn(difference, Topology.LearningRate);
+            outputNeurons[neuronIndex].Learn(difference);
         }
 
         for (int j = Layers.Count - 2; j >= 0; j--)
@@ -42,7 +42,7 @@ internal class NeuronNetwork
             {
                 var neuron = layer.NeuronsProperty[i];
                 double neuronDelta = previousLayer.NeuronsProperty.Sum(n => n.Weights[i] * n.Delta);
-                neuron.Learn(neuronDelta, Topology.LearningRate);
+                neuron.Learn(neuronDelta);
             }
         }
         var deltas = Layers.First().NeuronsProperty.Select(n => n.Delta).ToArray();
@@ -51,13 +51,13 @@ internal class NeuronNetwork
 
     public Neuron[] Predict(params double[] inputSignals)
     {
-        SendSignalsToInputNeurons(inputSignals);
-        FeedForwardAllLayersAfterInput();
+        SendInputsSignals(inputSignals);
+        FeedForwardLayers();
         //return [.. Layers.Last().NeuronsProperty.OrderByDescending(n => n.Output)];
         return [.. Layers.Last().NeuronsProperty];
     }
 
-    private void FeedForwardAllLayersAfterInput()
+    private void FeedForwardLayers()
     {
         for (int i = 1; i < Layers.Count; i++)
         {
@@ -69,7 +69,7 @@ internal class NeuronNetwork
         }
     }
 
-    private void SendSignalsToInputNeurons(params double[] inputSignals)
+    private void SendInputsSignals(params double[] inputSignals)
     {
         for (int i = 0; i < inputSignals.Length; i++)
         {
@@ -85,7 +85,7 @@ internal class NeuronNetwork
         var lastLayer = Layers.Last();
         for (int i = 0; i < Topology.OutputCount; i++)
         {
-            var neuron = new Neuron(lastLayer.NeuronCount, NeuronType.Output);
+            var neuron = new Neuron(lastLayer.NeuronCount, Topology.LearningRate, NeuronType.Output);
             outputNeurons.Add(neuron);
         }
         var outputLayer = new NeuralNetworkLayer(outputNeurons, NeuronType.Output);
@@ -100,7 +100,7 @@ internal class NeuronNetwork
             var lastLayer = Layers.Last();
             for (int i = 0; i < Topology.HiddenLayers[j]; i++)
             {
-                var neuron = new Neuron(lastLayer.NeuronCount);
+                var neuron = new Neuron(lastLayer.NeuronCount, Topology.LearningRate);
                 hiddenNeurons.Add(neuron);
             }
             var hiddenLayer = new NeuralNetworkLayer(hiddenNeurons);
@@ -113,7 +113,7 @@ internal class NeuronNetwork
         var inputNeurons = new List<Neuron>();
         for (int i = 0; i < Topology.InputCount; i++)
         {
-            var neuron = new Neuron(1, NeuronType.Input);
+            var neuron = new Neuron(1, Topology.LearningRate, NeuronType.Input);
             inputNeurons.Add(neuron);
         }
         var inputLayer = new NeuralNetworkLayer(inputNeurons, NeuronType.Input);

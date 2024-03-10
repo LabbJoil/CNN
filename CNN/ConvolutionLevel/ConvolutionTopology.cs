@@ -6,17 +6,10 @@ using System.Threading.Tasks;
 
 namespace CNM.ConvolutionalLevel;
 
-internal class ConvolutionTopology
+internal class ConvolutionTopology(int coreSize, int countLayers, int countMaps)
 {
-    //TODO: сделать абстрактеый класс с learningRate и другим дерьмом для этого и layer классов
-    public int CoreSize { get; }
-    public int CountLayers { get; }
-    public int CountMaps { get; }
-
-    public ConvolutionTopology(int convolutionalMatrixSize, int countLayers, int countMaps)
-    {
-        CoreSize = convolutionalMatrixSize;
-        CountLayers = countLayers;
-        CountMaps = countMaps;
-    }
+    //TODO: объединить в одну 3x матрицу, добавить learningRate -> убрать другие топологии
+    public int CoreSize { get; } = coreSize;
+    public int CountLayers { get; } = countLayers;
+    public int CountMaps { get; } = countMaps;
 }
