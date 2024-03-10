@@ -22,7 +22,7 @@ internal class Convolution
 
     public double Learn(double[][] expected, double[][,] matrixImages, int epoch)
     {
-        // TODO: входные параметры изменить на Dictionary | скорее всего вынести логику выше, и использовать expected на NeuralNetwork
+        // TODO: входные параметры изменить на dictionary | скорее всего вынести логику выше, и использовать expected на NeuralNetwork
         var error = 0.0;
         for (int i = 0; i < epoch; i++)
             for (int j = 0; j < expected.GetLength(0); j++)
