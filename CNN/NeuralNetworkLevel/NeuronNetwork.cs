@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CNN.Model;
 
-namespace CNM.ConnectedNeuralNetwork;
+namespace CNN.ConnectedNeuralNetwork;
 
 internal class NeuronNetwork
 {

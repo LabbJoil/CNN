@@ -1,9 +1,10 @@
 ﻿
 using System.Drawing;
 
-namespace CNM;
+namespace CNN;
 
 internal class ConverterPicture
+    // TODO: перенести как отдельная свёртка
 {
     const byte CountColors = 3;
     private int Height;
@@ -16,7 +17,8 @@ internal class ConverterPicture
         Height = resixeBitmapImage.Height;
         Width = resixeBitmapImage.Width;
        var rgbValues = ConvertToRGBValues(resixeBitmapImage);
-        ConvolutionRGBValues(rgbValues);
+        //ConvolutionRGBValues(rgbValues);
+        return new int[1, 1];   // INFO: затычка
     }
 
     public byte[,,] ConvertToRGBValues(Bitmap bitmapImage)

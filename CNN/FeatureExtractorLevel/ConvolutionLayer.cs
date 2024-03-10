@@ -1,5 +1,5 @@
 ﻿
-namespace CNM.ConvolutionalLevel;
+namespace CNN.ConvolutionalLevel;
 
 internal class ConvolutionLayer
 {

@@ -1,8 +1,8 @@
-﻿using CNM.ConnectedNeuralNetwork;
-using CNM.ConvolutionalLevel;
+﻿using CNN.ConnectedNeuralNetwork;
+using CNN.ConvolutionalLevel;
 using CNN.Model;
 
-namespace CNM;
+namespace CNN;
 
 internal class Program
 {
@@ -57,7 +57,7 @@ internal class Program
         }
 
         ConvolutionTopology topology = new(3, 3, 2);
-        Convolution convolution = new (topology);
+        FeatureExtractor convolution = new (topology);
         convolution.Learn();
 
         NeuralNetworkTopology neuralNetworkTopology = new(inputNeurons.Count, 3, 0.1, [inputNeurons.Count / 2, inputNeurons.Count / 2]);

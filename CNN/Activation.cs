@@ -1,5 +1,5 @@
 ﻿
-namespace CNM;
+namespace CNN;
 
 internal class Activation
 {

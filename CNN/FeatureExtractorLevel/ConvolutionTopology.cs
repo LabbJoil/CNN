@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CNM.ConvolutionalLevel;
+namespace CNN.ConvolutionalLevel;
 
 internal class ConvolutionTopology(int coreSize, int countLayers, int countMaps)
 {

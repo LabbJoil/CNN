@@ -1,4 +1,4 @@
-﻿using CNM.ConnectedNeuralNetwork;
+﻿using CNN.ConnectedNeuralNetwork;
 using CNN.Model;
 using System;
 using System.Collections.Generic;
@@ -6,14 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CNM.ConvolutionalLevel;
+namespace CNN.ConvolutionalLevel;
 
-internal class Convolution
+internal class FeatureExtractor
 {
     private ConvolutionTopology ConvolutionalTopology { get; }
     private List<ConvolutionLayer> ConvolutionalLayers { get; } = [];
 
-    public Convolution(ConvolutionTopology topology)
+    public FeatureExtractor(ConvolutionTopology topology)
     {
         // Maybe CreateInputLayers
         ConvolutionalTopology = topology;

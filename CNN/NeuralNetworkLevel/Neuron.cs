@@ -2,9 +2,9 @@
 using CNN.Abstract;
 using CNN.Model;
 
-namespace CNM.ConnectedNeuralNetwork;
+namespace CNN.ConnectedNeuralNetwork;
 
-internal class Neuron : NetworkComponent
+internal class Neuron : Training
 {
     public List<double> Weights { get; } = [];
     public List<double> Inputs { get; private set; } = [];
