@@ -9,13 +9,13 @@ namespace CNN.ConnectedNeuralNetwork;
 
 internal class NeuralNetworkLayer
 {
-    public List<Neuron> NeuronsProperty { get => new(Neurons); }
+    public List<Neuronn> NeuronsProperty { get => new(Neurons); }
     public int NeuronCount => NeuronsProperty?.Count ?? 0;
 
     public NeuronType Type;
-    private readonly List<Neuron> Neurons;
+    private readonly List<Neuronn> Neurons;
 
-    public NeuralNetworkLayer(List<Neuron> neurons, NeuronType type = NeuronType.Hidden)
+    public NeuralNetworkLayer(List<Neuronn> neurons, NeuronType type = NeuronType.Hidden)
     {
         // TODO: проверить все входные нейроны на соответствие типу
 

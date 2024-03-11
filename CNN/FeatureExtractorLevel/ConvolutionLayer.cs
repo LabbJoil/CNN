@@ -1,11 +1,13 @@
 ﻿
+using CNN.Abstract;
+
 namespace CNN.ConvolutionalLevel;
 
 internal class ConvolutionLayer
 {
-    public Core[] ConvolutionalObjects { get; }
+    public ConverterComponent[] ConvolutionalObjects { get; }
 
-    public ConvolutionLayer(Core[] convolutionalObjects)
+    public ConvolutionLayer(ConverterComponent[] convolutionalObjects)
     {
         ConvolutionalObjects = convolutionalObjects;
     }

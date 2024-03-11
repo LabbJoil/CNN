@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using CNM.ConnectedNeuralNetwork;
 using CNN.Model;
 
 namespace CNN.ConnectedNeuralNetwork;
@@ -49,7 +45,7 @@ internal class NeuronNetwork
         return (deltas, differences);
     }
 
-    public Neuron[] Predict(params double[] inputSignals)
+    public Neuronn[] Predict(params double[] inputSignals)
     {
         SendInputsSignals(inputSignals);
         FeedForwardLayers();
@@ -81,11 +77,11 @@ internal class NeuronNetwork
 
     private void CreateOutputLayer()
     {
-        var outputNeurons = new List<Neuron>();
+        var outputNeurons = new List<Neuronn>();
         var lastLayer = Layers.Last();
         for (int i = 0; i < Topology.OutputCount; i++)
         {
-            var neuron = new Neuron(lastLayer.NeuronCount, Topology.LearningRate, NeuronType.Output);
+            var neuron = new Neuronn(lastLayer.NeuronCount, Topology.LearningRate, NeuronType.Output);
             outputNeurons.Add(neuron);
         }
         var outputLayer = new NeuralNetworkLayer(outputNeurons, NeuronType.Output);
@@ -96,11 +92,11 @@ internal class NeuronNetwork
     {
         for (int j = 0; j < Topology.HiddenLayers.Count; j++)
         {
-            var hiddenNeurons = new List<Neuron>();
+            var hiddenNeurons = new List<Neuronn>();
             var lastLayer = Layers.Last();
             for (int i = 0; i < Topology.HiddenLayers[j]; i++)
             {
-                var neuron = new Neuron(lastLayer.NeuronCount, Topology.LearningRate);
+                var neuron = new Neuronn(lastLayer.NeuronCount, Topology.LearningRate);
                 hiddenNeurons.Add(neuron);
             }
             var hiddenLayer = new NeuralNetworkLayer(hiddenNeurons);
@@ -110,10 +106,10 @@ internal class NeuronNetwork
 
     private void CreateInputLayer()
     {
-        var inputNeurons = new List<Neuron>();
+        var inputNeurons = new List<Neuronn>();
         for (int i = 0; i < Topology.InputCount; i++)
         {
-            var neuron = new Neuron(1, Topology.LearningRate, NeuronType.Input);
+            var neuron = new Neuronn(1, Topology.LearningRate, NeuronType.Input);
             inputNeurons.Add(neuron);
         }
         var inputLayer = new NeuralNetworkLayer(inputNeurons, NeuronType.Input);

@@ -1,10 +1,9 @@
-﻿
-using CNN.Abstract;
+﻿using CNN.Interface;
 using CNN.Model;
 
 namespace CNN.ConnectedNeuralNetwork;
 
-internal class Neuron : Training
+internal class Neuronn : ITraining
 {
     public List<double> Weights { get; } = [];
     public List<double> Inputs { get; private set; } = [];
@@ -12,7 +11,7 @@ internal class Neuron : Training
     public double Output { get; private set; }
     public double Delta { get; private set; }
 
-    public Neuron(int inputCount, double learningRate, NeuronType type = NeuronType.Hidden) : base(learningRate)
+    public Neuronn(int inputCount, double learningRate, NeuronType type = NeuronType.Hidden)
     {
         NeuronType = type;
         InitWeightsRandomValue(inputCount);
@@ -48,7 +47,7 @@ internal class Neuron : Training
         return Output;
     }
 
-    public override void Learn<T>(T deltaT)
+    public void Learn<T>(T deltaT)
     {
         if (deltaT is double delta)
         {

@@ -20,7 +20,7 @@ internal class Convolution : ConverterComponent
         ConvolutionMatrix();
     }
 
-    public override void ReСollapse(double[,] deltas)
+    public override void ReCollapse(double[,] deltas)
     {
         ReConvolutionMatrix(deltas);
         Learn(deltas);
@@ -31,16 +31,16 @@ internal class Convolution : ConverterComponent
         //TODO: Проверка demo
         var (inputmatrix, heightInputeMatrix, widthInputeMatrix) = InputMatrix.MatrixData;
         var (core, heightCore, widthCore) = CoreMatrix.MatrixData;
-        double collapsedMatrixHeight = (double)(heightInputeMatrix - heightCore) / CollapseStep + 1,
-            collapsedMatrixWight = (double)(widthInputeMatrix - widthCore) / CollapseStep + 1;
+        double collapsedMatrixHeight = (double)(heightInputeMatrix - heightCore) / ConvertionStep + 1,
+            collapsedMatrixWidth = (double)(widthInputeMatrix - widthCore) / ConvertionStep + 1;
 
-        if (collapsedMatrixHeight % 1 != 0 || collapsedMatrixWight % 1 != 0)
-            throw new Exception($"The step {CollapseStep} is not suitable for the matrix {heightInputeMatrix}x{widthInputeMatrix}");
+        if (collapsedMatrixHeight % 1 != 0 || collapsedMatrixWidth % 1 != 0)
+            throw new Exception($"The step {ConvertionStep} is not suitable for the matrix {heightInputeMatrix}x{widthInputeMatrix}");
 
-        double[,] collapsedMatrix = new double[(int)collapsedMatrixHeight, (int)collapsedMatrixWight];
+        double[,] collapsedMatrix = new double[(int)collapsedMatrixHeight, (int)collapsedMatrixWidth];
 
-        for (int yInputMatrix = 0; yInputMatrix <= collapsedMatrixHeight; yInputMatrix += CollapseStep)
-            for (int xInputMatrix = 0; xInputMatrix <= collapsedMatrixWight; xInputMatrix += CollapseStep)
+        for (int yInputMatrix = 0; yInputMatrix <= collapsedMatrixHeight; yInputMatrix += ConvertionStep)
+            for (int xInputMatrix = 0; xInputMatrix <= collapsedMatrixWidth; xInputMatrix += ConvertionStep)
             {
                 double sum = 0;
                 for (int yCore = 0; yCore < heightCore; yCore++)
@@ -72,8 +72,8 @@ internal class Convolution : ConverterComponent
             for (int x = 0; x < widthCore; x++)
                 corRot180[y, x] = core[heightCore - y, widthCore - x];
 
-        for (int yConverMatrix = 0; yConverMatrix < deltas.GetLength(0); yConverMatrix += CollapseStep)
-            for (int xConverMatrix = 0; xConverMatrix < deltas.GetLength(1); xConverMatrix += CollapseStep)
+        for (int yConverMatrix = 0; yConverMatrix < deltas.GetLength(0); yConverMatrix += ConvertionStep)
+            for (int xConverMatrix = 0; xConverMatrix < deltas.GetLength(1); xConverMatrix += ConvertionStep)
             {
                 double sum = 0;
                 for (int yCore = 0; yCore < heightCore; yCore++)

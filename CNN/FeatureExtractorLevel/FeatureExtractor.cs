@@ -1,7 +1,11 @@
-﻿using CNN.ConnectedNeuralNetwork;
+﻿using CNN.Abstract;
+using CNN.ConnectedNeuralNetwork;
+using CNN.ConvolutionLevel.Convolution;
+using CNN.FeatureExtractorLevel.Converter;
 using CNN.Model;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,9 +39,9 @@ internal class FeatureExtractor
         return result;
     }
 
-    public List<double> Predict(double[,] matrixImage)
+    public List<double> CollapseImage(Bitmap bitmapImage)
     {
-        SetInputLayer(matrixImage);
+        SetInputLayer(bitmapImage);
         FeedForwardLayers();
 
         List<double> inputNeurons = []; // TODO: переделать в массив
@@ -99,22 +103,17 @@ internal class FeatureExtractor
             conObject.Сollapse(matrixImage);
     }
 
-    private void CreateInputLayers()
-    {
-
-    }
-
     private void CreateLayers()
     {
         for (int i = 0; i < ConvolutionalTopology.CountLayers; i++)
         {
-            ConvolutionType type = i % 2 == 0 ? ConvolutionType.Fold : ConvolutionType.Pulling;
-            Core[] layer = new Core[ConvolutionalTopology.CountMaps];
-            for (int j = 0; j < ConvolutionalTopology.CountMaps; j++)
-            {
-                if (type == ConvolutionType.Fold)
-                    layer[j] = new Core(type, ConvolutionalTopology.CoreSize);
-            }
+            ConverterComponent[] layer = new ConverterComponent[ConvolutionalTopology.CountMaps];
+            if (i % 2 == 0)
+                for (int j = 0; j < ConvolutionalTopology.CountMaps; j++)
+                    layer[j] = new Convolution(ConvolutionalTopology.CoreSize, 0.1); // INFO: 0.1 - затычка
+            else
+                for (int j = 0; j < ConvolutionalTopology.CountMaps; j++)
+                    layer[j] = new Pooling();
             ConvolutionalLayers.Add(new ConvolutionLayer(layer));
         }
     }

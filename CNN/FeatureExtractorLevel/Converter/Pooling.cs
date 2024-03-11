@@ -18,7 +18,7 @@ internal class Pooling : ConverterComponent
         PoolingMatrix();
     }
 
-    public override void ReСollapse(double[,] deltas)
+    public override void ReCollapse(double[,] deltas)
     {
         RePoolingMatrix(deltas);
     }
@@ -31,7 +31,7 @@ internal class Pooling : ConverterComponent
         //TODO: сделать step на ширину и высоту
         if (heightInputeMatrix % 2 == 0)
         {
-            CollapseStep = 2;
+            ConvertionStep = 2;
             pullingMatrixWidth = widthInputeMatrix / 2;
             pullingMatrixHeight = heightInputeMatrix / 2;
         }
@@ -44,10 +44,10 @@ internal class Pooling : ConverterComponent
         double[,] pullingMatrix = new double[pullingMatrixHeight, pullingMatrixWidth];
         (int, int)[] maxElementsPlaces = new (int, int)[pullingMatrixHeight * pullingMatrixWidth];
 
-        for (int yConverMatrix = 0, yPulling = 0; yConverMatrix < heightInputeMatrix - 1; yConverMatrix += CollapseStep, yPulling++)
+        for (int yConverMatrix = 0, yPulling = 0; yConverMatrix < heightInputeMatrix - 1; yConverMatrix += ConvertionStep, yPulling++)
         {
             var rowPulling = yPulling * pullingMatrixHeight;
-            for (int xConverMatrix = 0, xPulling = 0; xConverMatrix < widthInputeMatrix - 1; xConverMatrix += CollapseStep, xPulling++)
+            for (int xConverMatrix = 0, xPulling = 0; xConverMatrix < widthInputeMatrix - 1; xConverMatrix += ConvertionStep, xPulling++)
             {
                 double max = inputMatrix[yConverMatrix, xConverMatrix];
                 int maxY = yConverMatrix, maxX = xConverMatrix;
@@ -80,10 +80,10 @@ internal class Pooling : ConverterComponent
         var deltasWidth = deltas.GetLength(1);
         double[,] reCollapsMatrix = new double[heightInputeMatrix, widthInputeMatrix];
 
-        for (int yError = 0, yInput = 0; yError < deltasHeight; yError++, yInput += CollapseStep)
+        for (int yError = 0, yInput = 0; yError < deltasHeight; yError++, yInput += ConvertionStep)
         {
             var errorRow = yError * deltasHeight;
-            for (int xError = 0, xInput = 0; xError < deltasWidth; xError++, xInput += CollapseStep)
+            for (int xError = 0, xInput = 0; xError < deltasWidth; xError++, xInput += ConvertionStep)
             {
                 var (maxElementX, maxElementY) = MaxElementsPulling[errorRow + xError];
                 for (int yPullingMatrix = 0; yPullingMatrix < 2; yPullingMatrix++)
