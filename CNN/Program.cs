@@ -64,38 +64,18 @@ internal class Program
             pathImageKeyMean2baseValue[bitmapImage] = masbase2;
         }
 
-        int countMaps = HeightImage / 20,
-            convertionStep = 3,
-            coreSize;   // TODO: переделать под height и width (определить наибольшую сторону и относительно её задавать размер 2 стороны через пропорцию)
+        int countMaps = HeightImage / 20;
         var (heightOutput, widthOutput) = (HeightImage, WidthImage);
-        List<ConvolutionParams> convolutionParams = []; 
+        List<ConvolutionLayerParams> convolutionParams = []; 
 
         for (int iteration = 0, multipleHWO = heightOutput * widthOutput; multipleHWO > MaxOutputConvolutionNeurons; iteration++, multipleHWO = heightOutput * widthOutput)
         {
             if (iteration % 2 == 0)
             {
-                coreSize = (multipleHWO) switch
-                {
-                    > 400 => 7,
-                    > 300 => 6,
-                    > 200 => 5,
-                    > 100 => 4,
-                    _ => 3
-                };
+                var (height, stepHeight) = GetStepSize(heightOutput);
+                var (width, stepWidth) = GetStepSize(widthOutput);
 
-                double collapsedMatrixHeight, collapsedMatrixWidth;
-                for (int step = coreSize; step > 1; step--)
-                {
-                    collapsedMatrixHeight = (double)(heightOutput - coreSize) / step + 1;
-                    collapsedMatrixWidth = (double)(widthOutput - coreSize) / step + 1;   // INFO: coreSize - изменить на coreWidth
-                    if (collapsedMatrixHeight % 1 != 0 || collapsedMatrixWidth % 1 != 0)
-                    {
-                        convertionStep = step;
-                        break;
-                    }
-                }
-
-                convolutionParams.Add(new(convertionStep));
+                convolutionParams.Add(new(height, width, stepHeight, stepWidth));
 
             }
             
@@ -119,6 +99,31 @@ internal class Program
 
         
         var (deltas, differences) = neuronNetwork.Backpropagation(exprected, [.. inputNeurons]);
+    }
+
+    private static (int, int) GetStepSize(int size)
+    {
+        var coreSize = (size) switch
+        {
+            > 400 => 7,
+            > 300 => 6,
+            > 200 => 5,
+            > 100 => 4,
+            _ => 3
+        };
+
+        double newSize = -1;
+        int step = -1;
+        for (int maybeStep = coreSize - 1; maybeStep > 1; maybeStep--)
+        {
+            newSize = (double)(size - coreSize) / maybeStep + 1;
+            if (newSize % 1 != 0)
+            {
+                step = maybeStep;
+                break;
+            }
+        }
+        return ((int)newSize, step);
     }
 
     public void LoadWeights(string filePath)

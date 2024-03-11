@@ -1,10 +1,11 @@
 ﻿
 using CNN.Abstract;
+using CNN.Interface;
 using CNN.NeuralNetworkLevel;
 
 namespace CNN.FeatureExtractorLevel.Converter;
 
-internal class Convolution : ConverterComponent
+internal class Convolution : ConverterComponent, ITraining
 {
     private readonly MatrixHolder<double> CoreMatrix = new("Core");
 
@@ -116,7 +117,7 @@ internal class Convolution : ConverterComponent
         return newConvertMatrix;
     }
 
-    public override void Learn<T>(T delta)
+    public void Learn<T>(T delta)
     {
         if (delta is double[,] deltas)
         {
