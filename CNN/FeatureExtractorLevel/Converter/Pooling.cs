@@ -1,16 +1,12 @@
-﻿using CNN.Abstract;
-using CNN.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using CNN.Abstract;
 
-namespace CNN.ConvolutionLevel.Convolution;
+namespace CNN.FeatureExtractorLevel.Converter;
 
-internal class Pooling : ConverterComponent
+internal class Pooling(int stepHeight, int stepWidth, int countMaps) : ConverterComponent(stepHeight, stepWidth)
 {
     private (int, int)[]? MaxElementsPulling;
+    private Convolution[] ConvolutionLayer = new Convolution[countMaps];
 
     public override void Сollapse(double[,] inputMatrix)
     {
@@ -31,7 +27,7 @@ internal class Pooling : ConverterComponent
         //TODO: сделать step на ширину и высоту
         if (heightInputeMatrix % 2 == 0)
         {
-            ConvertionStep = 2;
+            StepHieghtConvertion = 2;
             pullingMatrixWidth = widthInputeMatrix / 2;
             pullingMatrixHeight = heightInputeMatrix / 2;
         }
@@ -44,10 +40,10 @@ internal class Pooling : ConverterComponent
         double[,] pullingMatrix = new double[pullingMatrixHeight, pullingMatrixWidth];
         (int, int)[] maxElementsPlaces = new (int, int)[pullingMatrixHeight * pullingMatrixWidth];
 
-        for (int yConverMatrix = 0, yPulling = 0; yConverMatrix < heightInputeMatrix - 1; yConverMatrix += ConvertionStep, yPulling++)
+        for (int yConverMatrix = 0, yPulling = 0; yConverMatrix < heightInputeMatrix - 1; yConverMatrix += StepHieghtConvertion, yPulling++)
         {
             var rowPulling = yPulling * pullingMatrixHeight;
-            for (int xConverMatrix = 0, xPulling = 0; xConverMatrix < widthInputeMatrix - 1; xConverMatrix += ConvertionStep, xPulling++)
+            for (int xConverMatrix = 0, xPulling = 0; xConverMatrix < widthInputeMatrix - 1; xConverMatrix += StepHieghtConvertion, xPulling++)
             {
                 double max = inputMatrix[yConverMatrix, xConverMatrix];
                 int maxY = yConverMatrix, maxX = xConverMatrix;
@@ -80,10 +76,10 @@ internal class Pooling : ConverterComponent
         var deltasWidth = deltas.GetLength(1);
         double[,] reCollapsMatrix = new double[heightInputeMatrix, widthInputeMatrix];
 
-        for (int yError = 0, yInput = 0; yError < deltasHeight; yError++, yInput += ConvertionStep)
+        for (int yError = 0, yInput = 0; yError < deltasHeight; yError++, yInput += StepHieghtConvertion)
         {
             var errorRow = yError * deltasHeight;
-            for (int xError = 0, xInput = 0; xError < deltasWidth; xError++, xInput += ConvertionStep)
+            for (int xError = 0, xInput = 0; xError < deltasWidth; xError++, xInput += StepHieghtConvertion)
             {
                 var (maxElementX, maxElementY) = MaxElementsPulling[errorRow + xError];
                 for (int yPullingMatrix = 0; yPullingMatrix < 2; yPullingMatrix++)

@@ -3,7 +3,7 @@ using CNN.Model;
 
 namespace CNN.ConnectedNeuralNetwork;
 
-internal class Neuronn : ITraining
+internal class TempNeuron : ITraining
 {
     public List<double> Weights { get; } = [];
     public List<double> Inputs { get; private set; } = [];
@@ -11,7 +11,7 @@ internal class Neuronn : ITraining
     public double Output { get; private set; }
     public double Delta { get; private set; }
 
-    public Neuronn(int inputCount, double learningRate, NeuronType type = NeuronType.Hidden)
+    public TempNeuron(int inputCount, double learningRate, NeuronType type = NeuronType.Hidden)
     {
         NeuronType = type;
         InitWeightsRandomValue(inputCount);

@@ -1,7 +1,7 @@
 ﻿
-using CNM.ConnectedNeuralNetwork;
 using CNN.ConnectedNeuralNetwork;
 using CNN.ConvolutionalLevel;
+using CNN.FeatureExtractorLevel;
 using CNN.Model;
 using System.Drawing;
 
@@ -47,84 +47,57 @@ internal class Program
         //oo.ReCollapse(ii);
     }
 
-    private const int MaxOutputConvolutionNeurons = 20;
-    private const int HeightImage = 216;    // INFO: maybe среднее значение по всем картинкам | пользователь сам задаёт
-    private const int WidthImage = 216;
+    private readonly Dictionary<string, int> PathImageValuePairs;
+    private readonly int MaxOutputConvolutionNeurons = 100;
+    private readonly int HeightImage = 216;    // INFO: maybe среднее значение по всем картинкам | пользователь сам задаёт
+    private readonly int WidthImage = 216;
 
-    public void StartLearning(Dictionary<string, int> pathImageKeyMeanbase10Value, double learningRate, int countEpoch)
+    public Program(Dictionary<string, int> pathImageValuePairs)
     {
-        int maxMean = pathImageKeyMeanbase10Value.Max(kv => kv.Value);
-        Dictionary<Bitmap, int[]> pathImageKeyMean2baseValue = [];
+        PathImageValuePairs = pathImageValuePairs;
+    }
 
-        foreach(var kv in pathImageKeyMeanbase10Value)
+    public void StartLearning(double learningRate, int countEpoch)
+    {
+        int countOutputNeurons = PathImageValuePairs.Max(kv => kv.Value);
+        Dictionary<Bitmap, int[]> bitmapImage2baseValuePairs = [];
+
+        foreach(var kv in PathImageValuePairs)
         {
             var bitmapImage = new Bitmap(new Bitmap(kv.Key), new Size(HeightImage, WidthImage));    // INFO: maybe проверка на размер (не меньше 48p)
-            var masbase2 = new int[maxMean];
+            var masbase2 = new int[countOutputNeurons];
             masbase2[kv.Value - 1] = 1;
-            pathImageKeyMean2baseValue[bitmapImage] = masbase2;
-        }
-
-        int countMaps = HeightImage / 20;
-        var (heightOutput, widthOutput) = (HeightImage, WidthImage);
-        List<ConvolutionLayerParams> convolutionParams = []; 
-
-        for (int iteration = 0, multipleHWO = heightOutput * widthOutput; multipleHWO > MaxOutputConvolutionNeurons; iteration++, multipleHWO = heightOutput * widthOutput)
-        {
-            if (iteration % 2 == 0)
-            {
-                var (height, stepHeight) = GetStepSize(heightOutput);
-                var (width, stepWidth) = GetStepSize(widthOutput);
-
-                convolutionParams.Add(new(height, width, stepHeight, stepWidth));
-
-            }
-            
+            bitmapImage2baseValuePairs[bitmapImage] = masbase2;
         }
 
 
-        ConvolutionTopology convolutionTopology = new(3, 3, 2);
-        NeuralNetworkTopology neuralNetworkTopology = new(inputNeurons.Count, 3, 0.1, [inputNeurons.Count / 2, inputNeurons.Count / 2]);
+        FeatureExtractor featureExtractor = new(new(HeightImage, WidthImage));
 
-        FeatureExtractor featureExtractor = new(convolutionTopology);
-        NeuronNetwork neuronNetwork = new(neuralNetworkTopology);
+        //var (convertLayersParam, countInputNeurons) = GetConverterLayerParams();
+        //int countNeuronLayers = convertLayersParam.Count;
 
-        for (int epoch = 0; epoch < countEpoch; epoch++)
-        {
-            foreach(var bi in pathImageKeyMean2baseValue)
-            {
-                var inputNeurons = featureExtractor.CollapseImage(bi.Key);
-            }
-        }
+        //int[] neuronLayers = new int[countNeuronLayers];
+        //for (int i = 0, multipleDigit = countNeuronLayers; i < countNeuronLayers; i++, multipleDigit--)
+        //    neuronLayers[i] = countInputNeurons * multipleDigit;
+
+        //NeuralNetworkTopology neuralNetworkTopology = new(countInputNeurons, countOutputNeurons, learningRate, neuronLayers);
+
+        //NeuronNetwork neuronNetwork = new(neuralNetworkTopology);
+
+        //for (int epoch = 0; epoch < countEpoch; epoch++)
+        //{
+        //    foreach(var bi in bitmapImage2baseValuePairs)
+        //    {
+        //        var inputNeurons = featureExtractor.CollapseImage(bi.Key);
+        //    }
+        //}
 
 
-        
-        var (deltas, differences) = neuronNetwork.Backpropagation(exprected, [.. inputNeurons]);
+
+        //var (deltas, differences) = neuronNetwork.Backpropagation(exprected, [.. inputNeurons]);
     }
 
-    private static (int, int) GetStepSize(int size)
-    {
-        var coreSize = (size) switch
-        {
-            > 400 => 7,
-            > 300 => 6,
-            > 200 => 5,
-            > 100 => 4,
-            _ => 3
-        };
-
-        double newSize = -1;
-        int step = -1;
-        for (int maybeStep = coreSize - 1; maybeStep > 1; maybeStep--)
-        {
-            newSize = (double)(size - coreSize) / maybeStep + 1;
-            if (newSize % 1 != 0)
-            {
-                step = maybeStep;
-                break;
-            }
-        }
-        return ((int)newSize, step);
-    }
+    
 
     public void LoadWeights(string filePath)
     {

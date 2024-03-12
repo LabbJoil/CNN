@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CNN.ConnectedNeuralNetwork;
+namespace CNN.Model;
 
 internal class NeuralNetworkTopology
 {

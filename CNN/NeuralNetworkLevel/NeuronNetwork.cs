@@ -45,7 +45,7 @@ internal class NeuronNetwork
         return (deltas, differences);
     }
 
-    public Neuronn[] Predict(params double[] inputSignals)
+    public TempNeuron[] Predict(params double[] inputSignals)
     {
         SendInputsSignals(inputSignals);
         FeedForwardLayers();
@@ -77,11 +77,11 @@ internal class NeuronNetwork
 
     private void CreateOutputLayer()
     {
-        var outputNeurons = new List<Neuronn>();
+        var outputNeurons = new List<TempNeuron>();
         var lastLayer = Layers.Last();
         for (int i = 0; i < Topology.OutputCount; i++)
         {
-            var neuron = new Neuronn(lastLayer.NeuronCount, Topology.LearningRate, NeuronType.Output);
+            var neuron = new TempNeuron(lastLayer.NeuronCount, Topology.LearningRate, NeuronType.Output);
             outputNeurons.Add(neuron);
         }
         var outputLayer = new NeuralNetworkLayer(outputNeurons, NeuronType.Output);
@@ -92,11 +92,11 @@ internal class NeuronNetwork
     {
         for (int j = 0; j < Topology.HiddenLayers.Count; j++)
         {
-            var hiddenNeurons = new List<Neuronn>();
+            var hiddenNeurons = new List<TempNeuron>();
             var lastLayer = Layers.Last();
             for (int i = 0; i < Topology.HiddenLayers[j]; i++)
             {
-                var neuron = new Neuronn(lastLayer.NeuronCount, Topology.LearningRate);
+                var neuron = new TempNeuron(lastLayer.NeuronCount, Topology.LearningRate);
                 hiddenNeurons.Add(neuron);
             }
             var hiddenLayer = new NeuralNetworkLayer(hiddenNeurons);
@@ -106,10 +106,10 @@ internal class NeuronNetwork
 
     private void CreateInputLayer()
     {
-        var inputNeurons = new List<Neuronn>();
+        var inputNeurons = new List<TempNeuron>();
         for (int i = 0; i < Topology.InputCount; i++)
         {
-            var neuron = new Neuronn(1, Topology.LearningRate, NeuronType.Input);
+            var neuron = new TempNeuron(1, Topology.LearningRate, NeuronType.Input);
             inputNeurons.Add(neuron);
         }
         var inputLayer = new NeuralNetworkLayer(inputNeurons, NeuronType.Input);

@@ -1,6 +1,7 @@
 ﻿using CNN.Abstract;
 using CNN.ConnectedNeuralNetwork;
-using CNN.ConvolutionLevel.Convolution;
+using CNN.ConvolutionalLevel;
+using CNN.FeatureExtractorLevel.Convolution;
 using CNN.FeatureExtractorLevel.Converter;
 using CNN.Model;
 using System;
@@ -10,18 +11,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CNN.ConvolutionalLevel;
+namespace CNN.FeatureExtractorLevel;
 
-internal class FeatureExtractor
+internal partial class FeatureExtractor
 {
     private ConvolutionTopology ConvolutionalTopology { get; }
     private List<ConvolutionLayer> ConvolutionalLayers { get; } = [];
 
     public FeatureExtractor(ConvolutionTopology topology)
     {
-        // Maybe CreateInputLayers
+        GetConverterLayerParams(topology.HeightImage, topology.WidthImage, topology.MaxInputNeurons);
         ConvolutionalTopology = topology;
-        CreateLayers();
     }
 
     public double Learn(double[][] expected, double[][,] matrixImages, int epoch)
@@ -103,18 +103,18 @@ internal class FeatureExtractor
             conObject.Сollapse(matrixImage);
     }
 
-    private void CreateLayers()
-    {
-        for (int i = 0; i < ConvolutionalTopology.CountLayers; i++)
-        {
-            ConverterComponent[] layer = new ConverterComponent[ConvolutionalTopology.CountMaps];
-            if (i % 2 == 0)
-                for (int j = 0; j < ConvolutionalTopology.CountMaps; j++)
-                    layer[j] = new Convolution(ConvolutionalTopology.CoreSize, 0.1); // INFO: 0.1 - затычка
-            else
-                for (int j = 0; j < ConvolutionalTopology.CountMaps; j++)
-                    layer[j] = new Pooling();
-            ConvolutionalLayers.Add(new ConvolutionLayer(layer));
-        }
-    }
+    //private void CreateLayers()
+    //{
+    //    for (int i = 0; i < ConvolutionalTopology.CountLayers; i++)
+    //    {
+    //        ConverterComponent[] layer = new ConverterComponent[ConvolutionalTopology.CountMaps];
+    //        if (i % 2 == 0)
+    //            for (int j = 0; j < ConvolutionalTopology.CountMaps; j++)
+    //                layer[j] = new Convolution(ConvolutionalTopology.CoreSize, 0.1); // INFO: 0.1 - затычка
+    //        else
+    //            for (int j = 0; j < ConvolutionalTopology.CountMaps; j++)
+    //                layer[j] = new Pooling();
+    //        ConvolutionalLayers.Add(new ConvolutionLayer(layer));
+    //    }
+    //}
 }

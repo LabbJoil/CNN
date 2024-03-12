@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace CNN.Model;
 
-internal class ConvolutionLayerParams(int heightCore, int widthCore, int stepHeight, int stepWidth, int countMaps)
+internal class ConvertLayerParams(int coreheight, int coreWidth, int stepHeight, int stepWidth, int countMaps)
 {
-    public readonly int HeightCore = heightCore;
-    public readonly int WidthCore = widthCore;
+    public readonly int CoreHeight = coreheight;
+    public readonly int CoreWidth = coreWidth;
     public readonly int StepHeight = stepHeight;
     public readonly int StepWidth = stepWidth;
     public readonly int CountMaps = countMaps;
