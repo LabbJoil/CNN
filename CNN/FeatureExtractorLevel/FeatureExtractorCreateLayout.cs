@@ -39,7 +39,7 @@ internal partial class FeatureExtractor
             (matrixHeight, matrixWidth) = (newMatrixHeight, newMatrixWidth);
             multipleHWO = matrixHeight * matrixWidth;
         }
-        return (convertLayerParams, multipleHWO * 10);
+        return (convertLayerParams, multipleHWO * countMaps);
     }
 
     private static (int, int) GetPoolingStepSize(int size)
