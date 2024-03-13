@@ -1,6 +1,7 @@
 ﻿
 using CNM.ConnectedNeuralNetwork;
-using CNN.Model;
+using CNN.Model.Topology;
+using CNN.Model.Type;
 
 namespace CNN.ConnectedNeuralNetwork;
 

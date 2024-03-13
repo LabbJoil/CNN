@@ -1,24 +1,16 @@
-﻿using CNN.Abstract;
-using CNN.ConnectedNeuralNetwork;
+﻿
 using CNN.ConvolutionalLevel;
-using CNN.FeatureExtractorLevel.Convolution;
-using CNN.FeatureExtractorLevel.Converter;
-using CNN.Model;
-using System;
-using System.Collections.Generic;
+using CNN.Model.Topology;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CNN.FeatureExtractorLevel;
 
 internal partial class FeatureExtractor
 {
-    private ConvolutionTopology ConvolutionalTopology { get; }
+    private FeatureExtractorTopology ConvolutionalTopology { get; }
     private List<ConvolutionLayer> ConvolutionalLayers { get; } = [];
 
-    public FeatureExtractor(ConvolutionTopology topology)
+    public FeatureExtractor(FeatureExtractorTopology topology)
     {
         GetConverterLayerParams(topology.HeightImage, topology.WidthImage, topology.MaxInputNeurons);
         ConvolutionalTopology = topology;

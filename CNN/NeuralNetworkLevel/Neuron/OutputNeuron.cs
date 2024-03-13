@@ -8,5 +8,6 @@ namespace CNN.NeuralNetworkLevel.Neuron;
 
 internal class OutputNeuron
 {
+    private readonly double LearningRate;
 
 }

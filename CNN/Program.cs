@@ -48,8 +48,8 @@ internal class Program
     }
 
     private readonly Dictionary<string, int> PathImageValuePairs;
-    private readonly int MaxOutputConvolutionNeurons = 100;
-    private readonly int HeightImage = 216;    // INFO: maybe среднее значение по всем картинкам | пользователь сам задаёт
+    private readonly int MaxInputNeurons = 100;
+    private readonly int HeightImage = 216;    // INFO maybe: среднее значение по всем картинкам | пользователь сам задаёт
     private readonly int WidthImage = 216;
 
     public Program(Dictionary<string, int> pathImageValuePairs)
@@ -64,14 +64,14 @@ internal class Program
 
         foreach(var kv in PathImageValuePairs)
         {
-            var bitmapImage = new Bitmap(new Bitmap(kv.Key), new Size(HeightImage, WidthImage));    // INFO: maybe проверка на размер (не меньше 48p)
+            var bitmapImage = new Bitmap(new Bitmap(kv.Key), new Size(HeightImage, WidthImage));    // INFO maybe: проверка на размер (не меньше 48p)
             var masbase2 = new int[countOutputNeurons];
             masbase2[kv.Value - 1] = 1;
             bitmapImage2baseValuePairs[bitmapImage] = masbase2;
         }
 
 
-        FeatureExtractor featureExtractor = new(new(HeightImage, WidthImage));
+        FeatureExtractor featureExtractor = new(new(HeightImage, WidthImage, MaxInputNeurons));
 
         //var (convertLayersParam, countInputNeurons) = GetConverterLayerParams();
         //int countNeuronLayers = convertLayersParam.Count;

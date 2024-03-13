@@ -1,12 +1,13 @@
 ﻿
 using CNN.Abstract;
+using CNN.Model.Params;
 
 namespace CNN.FeatureExtractorLevel.Converter;
 
-internal class Pooling(int stepHeight, int stepWidth, int countMaps) : ConverterComponent(stepHeight, stepWidth)
+internal class Pooling(ConverterComponentParams ccParams) : ConverterComponent(ccParams)
 {
-    private (int, int)[]? MaxElementsPulling;
-    private Convolution[] ConvolutionLayer = new Convolution[countMaps];
+    private (int, int)[]? MaxElementsPooling;
+    private Convolution[] ConvolutionLayer = new Convolution[ccParams.CountMaps];
 
     public override void Сollapse(double[,] inputMatrix)
     {
@@ -21,29 +22,15 @@ internal class Pooling(int stepHeight, int stepWidth, int countMaps) : Converter
 
     private void PoolingMatrix()
     {
-        int pullingMatrixWidth, pullingMatrixHeight;
-        var (inputMatrix, heightInputeMatrix, widthInputeMatrix) = InputMatrix.MatrixData;
+        var (inputMatrix, inputMatrixHeight, inputMatrixWidth) = InputMatrix.MatrixData;
+        var (collapsedMatrixHeight, collapsedMatrixWidth) = СollapsedMatrix.MatrixSizes;
+        double[,] collapsedMatrix = new double[collapsedMatrixHeight, collapsedMatrixWidth];
+        (int, int)[] maxElementsPlaces = new (int, int)[collapsedMatrixHeight * collapsedMatrixWidth];
 
-        //TODO: сделать step на ширину и высоту
-        if (heightInputeMatrix % 2 == 0)
+        for (int yConverMatrix = 0, yPooling = 0; yConverMatrix < inputMatrixHeight - 1; yConverMatrix += StepConvertionHieght, yPooling++)
         {
-            StepHieghtConvertion = 2;
-            pullingMatrixWidth = widthInputeMatrix / 2;
-            pullingMatrixHeight = heightInputeMatrix / 2;
-        }
-        else
-        {
-            pullingMatrixWidth = widthInputeMatrix - 1;
-            pullingMatrixHeight = heightInputeMatrix - 1;
-        }
-
-        double[,] pullingMatrix = new double[pullingMatrixHeight, pullingMatrixWidth];
-        (int, int)[] maxElementsPlaces = new (int, int)[pullingMatrixHeight * pullingMatrixWidth];
-
-        for (int yConverMatrix = 0, yPulling = 0; yConverMatrix < heightInputeMatrix - 1; yConverMatrix += StepHieghtConvertion, yPulling++)
-        {
-            var rowPulling = yPulling * pullingMatrixHeight;
-            for (int xConverMatrix = 0, xPulling = 0; xConverMatrix < widthInputeMatrix - 1; xConverMatrix += StepHieghtConvertion, xPulling++)
+            var rowPooling = yPooling * collapsedMatrixHeight;
+            for (int xConverMatrix = 0, xPooling = 0; xConverMatrix < inputMatrixWidth - 1; xConverMatrix += StepConvertionWidth, xPooling++)
             {
                 double max = inputMatrix[yConverMatrix, xConverMatrix];
                 int maxY = yConverMatrix, maxX = xConverMatrix;
@@ -58,35 +45,35 @@ internal class Pooling(int stepHeight, int stepWidth, int countMaps) : Converter
                             max = newMax;
                         }
                     }
-                maxElementsPlaces[rowPulling + xPulling] = (maxX, maxY);
-                pullingMatrix[yPulling, xPulling] = max;
+                maxElementsPlaces[rowPooling + xPooling] = (maxX, maxY);
+                collapsedMatrix[yPooling, xPooling] = max;
             }
         }
-        СollapsedMatrix.SetMatrix(pullingMatrix);
-        MaxElementsPulling = maxElementsPlaces;
+        СollapsedMatrix.SetMatrix(collapsedMatrix);
+        MaxElementsPooling = maxElementsPlaces;
     }
 
     private void RePoolingMatrix(double[,] deltas)
     {
-        if (MaxElementsPulling == null)
-            throw new Exception("Max elements of pulling not found");
+        if (MaxElementsPooling == null)
+            throw new Exception("Max elements of Pooling not found");
 
         var (heightInputeMatrix, widthInputeMatrix) = InputMatrix.MatrixSizes;
         var deltasHeight = deltas.GetLength(0);
         var deltasWidth = deltas.GetLength(1);
         double[,] reCollapsMatrix = new double[heightInputeMatrix, widthInputeMatrix];
 
-        for (int yError = 0, yInput = 0; yError < deltasHeight; yError++, yInput += StepHieghtConvertion)
+        for (int yError = 0, yInput = 0; yError < deltasHeight; yError++, yInput += StepConvertionHieght)
         {
             var errorRow = yError * deltasHeight;
-            for (int xError = 0, xInput = 0; xError < deltasWidth; xError++, xInput += StepHieghtConvertion)
+            for (int xError = 0, xInput = 0; xError < deltasWidth; xError++, xInput += StepConvertionHieght)
             {
-                var (maxElementX, maxElementY) = MaxElementsPulling[errorRow + xError];
-                for (int yPullingMatrix = 0; yPullingMatrix < 2; yPullingMatrix++)
-                    for (int xPullingMatrix = 0; xPullingMatrix < 2; xPullingMatrix++)
+                var (maxElementX, maxElementY) = MaxElementsPooling[errorRow + xError];
+                for (int yPoolingMatrix = 0; yPoolingMatrix < 2; yPoolingMatrix++)
+                    for (int xPoolingMatrix = 0; xPoolingMatrix < 2; xPoolingMatrix++)
                     {
-                        int y = yInput + yPullingMatrix,
-                            x = xInput + xPullingMatrix;
+                        int y = yInput + yPoolingMatrix,
+                            x = xInput + xPoolingMatrix;
                         if (maxElementX == x && maxElementY == y)
                             reCollapsMatrix[y, x] += deltas[yError, xError];
                     }

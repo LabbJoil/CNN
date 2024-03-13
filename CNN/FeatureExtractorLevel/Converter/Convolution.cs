@@ -1,20 +1,22 @@
 ﻿
 using CNN.Abstract;
 using CNN.Interface;
-using CNN.Model;
+using CNN.Model.Params;
 using CNN.NeuralNetworkLevel;
 
 namespace CNN.FeatureExtractorLevel.Converter;
 
 internal class Convolution : ConverterComponent, ITraining
 {
-    private readonly MatrixHolder<double> CoreMatrix = new("Core");
+    private readonly MatrixHolder<double> CoreMatrix;
     private readonly Pooling[] PoolingLayer;
+    private readonly double LearningRate;
 
-    public Convolution(ConvertLayerParams convertParams) : base(convertParams.StepHeight, convertParams.StepWidth)  // TODO maybe: задавать learningRate статично
+    public Convolution(ConvolutionParams convertParams) : base(convertParams)  // TODO maybe: задавать learningRate статично
     {
         PoolingLayer = new Pooling[convertParams.CountMaps];
         var core = CreateCore(convertParams.CoreHeight, convertParams.CoreWidth);
+        CoreMatrix = new("Core", convertParams.CoreHeight, convertParams.CoreWidth);
         CoreMatrix.SetMatrix(core);
     }
 
@@ -33,23 +35,19 @@ internal class Convolution : ConverterComponent, ITraining
     private void ConvolutionMatrix()
     {
         //TODO: Проверка demo
-        var (inputmatrix, heightInputeMatrix, widthInputeMatrix) = InputMatrix.MatrixData;
+        var inputMatrix = InputMatrix.MatrixTable;
         var (core, heightCore, widthCore) = CoreMatrix.MatrixData;
-        double collapsedMatrixHeight = (double)(heightInputeMatrix - heightCore) / StepHieghtConvertion + 1,
-            collapsedMatrixWidth = (double)(widthInputeMatrix - widthCore) / StepHieghtConvertion + 1;
+        var (collapsedMatrixHeight, collapsedMatrixWidth) = СollapsedMatrix.MatrixSizes;
 
-        if (collapsedMatrixHeight % 1 != 0 || collapsedMatrixWidth % 1 != 0)
-            throw new Exception($"The step {StepHieghtConvertion} is not suitable for the matrix {heightInputeMatrix}x{widthInputeMatrix}");
+        double[,] collapsedMatrix = new double[collapsedMatrixHeight, collapsedMatrixWidth];
 
-        double[,] collapsedMatrix = new double[(int)collapsedMatrixHeight, (int)collapsedMatrixWidth];
-
-        for (int yInputMatrix = 0; yInputMatrix <= collapsedMatrixHeight; yInputMatrix += StepHieghtConvertion)
-            for (int xInputMatrix = 0; xInputMatrix <= collapsedMatrixWidth; xInputMatrix += StepHieghtConvertion)
+        for (int yInputMatrix = 0; yInputMatrix <= collapsedMatrixHeight; yInputMatrix += StepConvertionHieght)
+            for (int xInputMatrix = 0; xInputMatrix <= collapsedMatrixWidth; xInputMatrix += StepConvertionWidth)
             {
                 double sum = 0;
                 for (int yCore = 0; yCore < heightCore; yCore++)
                     for (int xCore = 0; xCore < widthCore; xCore++)
-                        sum += inputmatrix[yInputMatrix + yCore, xInputMatrix + xCore] * core[yCore, xCore];
+                        sum += inputMatrix[yInputMatrix + yCore, xInputMatrix + xCore] * core[yCore, xCore];
                 collapsedMatrix[yInputMatrix, xInputMatrix] = sum;
             }
         СollapsedMatrix.SetMatrix(collapsedMatrix);
@@ -57,7 +55,6 @@ internal class Convolution : ConverterComponent, ITraining
 
     private void ReConvolutionMatrix(double[,] deltas)
     {
-        //INFO: работает пока что только с CollapseStep = 1
         //TODO: проверить в demo
 
         var (core, heightCore, widthCore) = CoreMatrix.MatrixData;
@@ -76,8 +73,8 @@ internal class Convolution : ConverterComponent, ITraining
             for (int x = 0; x < widthCore; x++)
                 corRot180[y, x] = core[heightCore - y, widthCore - x];
 
-        for (int yConverMatrix = 0; yConverMatrix < deltas.GetLength(0); yConverMatrix += StepHieghtConvertion)
-            for (int xConverMatrix = 0; xConverMatrix < deltas.GetLength(1); xConverMatrix += StepHieghtConvertion)
+        for (int yConverMatrix = 0; yConverMatrix < deltas.GetLength(0); yConverMatrix += StepConvertionHieght)
+            for (int xConverMatrix = 0; xConverMatrix < deltas.GetLength(1); xConverMatrix += StepConvertionWidth)
             {
                 double sum = 0;
                 for (int yCore = 0; yCore < heightCore; yCore++)

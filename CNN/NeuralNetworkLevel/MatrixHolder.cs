@@ -1,10 +1,12 @@
-﻿namespace CNN.NeuralNetworkLevel;
+﻿using System.Xml.Linq;
 
-internal class MatrixHolder<T>(string name)
+namespace CNN.NeuralNetworkLevel;
+
+internal class MatrixHolder<T>(string name, int height, int width)
 {
     private T[,]? Matrix;
-    private int Height;
-    private int Width;
+    private readonly int Height = height;
+    private readonly int Width = width;
     private readonly string Name = name;
 
     public (T[,], int, int) MatrixData
@@ -26,8 +28,12 @@ internal class MatrixHolder<T>(string name)
 
     public void SetMatrix(T[,] matrix)
     {
+        int height = matrix.GetLength(0),
+            width = matrix.GetLength(1);
+        if (height != Height)
+            throw new Exception($"Высота матрицы не совпадает с изначальными расчётами. Расчёт - <{Height}> Вход - <{height}>");
+        if (width != Width)
+            throw new Exception($"Ширина матрицы не совпадает с изначальными расчётами. Расчёт - <{Width}> Вход - <{width}>");
         Matrix = matrix;
-        Height = matrix.GetLength(0);
-        Width = matrix.GetLength(1);
     }
 }

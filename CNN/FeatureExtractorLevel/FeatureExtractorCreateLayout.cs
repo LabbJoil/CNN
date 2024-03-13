@@ -1,45 +1,42 @@
-﻿using CNN.FeatureExtractorLevel.Converter;
-using CNN.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using CNN.Model.Params;
 
 namespace CNN.FeatureExtractorLevel;
 
 internal partial class FeatureExtractor
 {
-    private (List<ConvertLayerParams>, int) GetConverterLayerParams(int heightImage, int widthImage, int maxInputNeurons)
+
+
+    private int GetConverterLayerParams(int heightImage, int widthImage, int maxInputNeurons)
     {
         int countMaps = heightImage / 20;
-        var (matrixHeight, stepHeight) = GetConvolutionStepSize(heightImage);
-        var (matrixWidth, stepWidth) = GetConvolutionStepSize(widthImage);
-        List<ConvertLayerParams> convertLayerParams = [new(matrixHeight, matrixWidth, stepHeight, stepWidth, countMaps)];
+        var (matrixHeight, coreHeight, stepHeight) = GetConvolutionStepSize(heightImage);
+        var (matrixWidth, coreWidth, stepWidth) = GetConvolutionStepSize(widthImage);
+        //List<ConvolutionParams> convertLayerParams = [new(coreHeight, coreWidth, stepHeight, stepWidth, countMaps)];
         int multipleHWO = matrixHeight * matrixWidth;
 
         for (int iteration = 1; multipleHWO > maxInputNeurons; iteration++)
         {
-            ConvertLayerParams newLayerParams;
-            int newMatrixHeight, newMatrixWidth;
+            //ConvolutionParams newLayerParams;
+            int outputMatrixHeight, outputMatrixWidth;
             if (iteration % 2 == 0)
             {
-                (newMatrixHeight, stepHeight) = GetConvolutionStepSize(matrixHeight);
-                (newMatrixWidth, stepWidth) = GetConvolutionStepSize(matrixWidth);
-                //ConvolutionalLayers.Add(new Convolution(new(matr), 0.1));   // INFO: 0.1 - затычка | TODO: карты на следующем слое должны подбираться 
-                newLayerParams = new(matrixHeight, matrixWidth, stepHeight, stepWidth, 1);
+                (outputMatrixHeight, coreHeight, stepHeight) = GetConvolutionStepSize(matrixHeight);
+                (outputMatrixWidth, coreWidth, stepWidth) = GetConvolutionStepSize(matrixWidth);
+                //ConvolutionalLayers.Add(new Convolution(new(matr), 0.1));   // INFO: 0.1 - затычка | TODO: карты на следующем слое должны подбираться
+                //newLayerParams = new(coreHeight, coreWidth, stepHeight, stepWidth, 1);
             }
             else
             {
-                (newMatrixHeight, stepHeight) = GetPoolingStepSize(matrixHeight);
-                (newMatrixWidth, stepWidth) = GetPoolingStepSize(matrixWidth);
-                newLayerParams = new(matrixHeight, matrixWidth, stepHeight, stepWidth, 1);
+                (outputMatrixHeight, stepHeight) = GetPoolingStepSize(matrixHeight);
+                (outputMatrixWidth, stepWidth) = GetPoolingStepSize(matrixWidth);
+                //newLayerParams = new(matrixHeight, matrixWidth, stepHeight, stepWidth, 1);
             }
-            convertLayerParams.Add(newLayerParams);
-            (matrixHeight, matrixWidth) = (newMatrixHeight, newMatrixWidth);
+            //convertLayerParams.Add(newLayerParams);
+            (matrixHeight, matrixWidth) = (outputMatrixHeight, outputMatrixWidth);
             multipleHWO = matrixHeight * matrixWidth;
         }
-        return (convertLayerParams, multipleHWO * countMaps);
+        return multipleHWO * countMaps;
     }
 
     private static (int, int) GetPoolingStepSize(int size)
@@ -49,7 +46,7 @@ internal partial class FeatureExtractor
         return (step, newSize);
     }
 
-    private static (int, int) GetConvolutionStepSize(int size)
+    private static (int, int, int) GetConvolutionStepSize(int size)
     {
         var coreSize = (size) switch
         {
@@ -71,6 +68,6 @@ internal partial class FeatureExtractor
                 break;
             }
         }
-        return ((int)newSize, step);
+        return ((int)newSize, coreSize, step);
     }
 }

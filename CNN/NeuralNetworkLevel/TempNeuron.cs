@@ -1,5 +1,5 @@
 ﻿using CNN.Interface;
-using CNN.Model;
+using CNN.Model.Type;
 
 namespace CNN.ConnectedNeuralNetwork;
 

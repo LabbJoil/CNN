@@ -8,5 +8,6 @@ namespace CNN.NeuralNetworkLevel.Neuron;
 
 internal class HiddenNeuron
 {
+    private readonly double LearningRate;
 
 }
